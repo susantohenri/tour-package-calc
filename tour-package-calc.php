@@ -53,7 +53,8 @@ add_shortcode('tour-package-calculator', function () {
 	}, $dropdowns);
 
 	$html = '';
-	foreach ($dropdowns as $d) {
+	foreach ($dropdowns as $i => $d) {
+		if ($i > 1) continue;
 		$html .= "<label><b>{$d['label']}</b></label> ";
 		$html .= "<select id=\"{$d['name']}\" onchange=\"javascript:tour_package_calculator();\">";
 		foreach ($d['options'] as $o) {
@@ -64,55 +65,81 @@ add_shortcode('tour-package-calculator', function () {
 	}
 
 	$html .= "
+		<br>
+		<label><b>ADD ONS</b></label>
+	";
+	foreach ($dropdowns[2]['options'] as $add_on) {
+		$html .= "<br><input type=\"text\" onKeyUp=\"javascript:tour_package_calculator();\" class=\"tour_package_calculator_add_ons\" data-price=\"{$add_on['value']}\"> {$add_on['text']}";
+	}
+	$html .= "<br>";
+
+	$html .= "
 		<link rel=\"stylesheet\" href=\"https://code.jquery.com/ui/1.13.3/themes/base/jquery-ui.css\">
 		<link rel=\"stylesheet\" href=\"/resources/demos/style.css\">
 		<script src=\"https://code.jquery.com/jquery-3.7.1.js\"></script>
 		<script src=\"https://code.jquery.com/ui/1.13.3/jquery-ui.js\"></script>
 	";
 
-	$today = date('m/d/Y');
-	$html .= "<label><b>FIRST PAYMENT DATE</b></label> <input type=\"text\" id=\"tour-package-calc-first-payment-date\" value=\"{$today}\" onchange=\"javascript:tour_package_calculator();\" ><br>";
+	$html .= "<label><b>FIRST PAYMENT DATE</b></label> <input type=\"text\" id=\"tour-package-calc-first-payment-date\" onchange=\"javascript:tour_package_calculator();\" ><br>";
 
-	$html .= "<label><b>FINAL PAYMENT DATE</b></label> <input type=\"text\" id=\"tour-package-calc-final-payment-date\" disabled ><br>";
+	$html .= "<label><b>FINAL PAYMENT DATE</b></label> <input type=\"text\" id=\"tour-package-calc-final-payment-date\" ><br>";
 
 	$html .= "<br><b>UPFRONT (WITHIN 7 DAYS)</b> $51.95 DEPOSIT + ONE FINAL PAYMENT OF $<span id=\"tour-package-calc-upfront\">0</span> PER PERSON";
 	$html .= "<br><b>WEEKLY</b> $51.95 DEPOSIT + (<span class=\"tour-package-calc-weeks\"></span>) INSTALMENTS OF $<span id=\"tour-package-calc-weekly\">0</span> PER PERSON";
-	$html .= "<br><b>MONTHLY</b> $51.95  DEPOSIT + (<span class=\"tour-package-calc-weeks\"></span>) INSTALMENTS OF $<span id=\"tour-package-calc-monthly\">0</span> PER PERSON";
+	$html .= "<br><b>MONTHLY</b> $51.95  DEPOSIT + (<span class=\"tour-package-calc-months\"></span>) INSTALMENTS OF $<span id=\"tour-package-calc-monthly\">0</span> PER PERSON";
 
 	$html .= "<br><br>THE ABOVE INCLUDES 2.9% CREDIT CARD FEE & 9% FINANCING ADMIN FEE FOR WEEKLY OR MONTHLY";
 
 	$html .= "
 		<script type=\"text/javascript\">
-			jQuery(`[id=\"tour-package-calc-first-payment-date\"]`).datepicker()
+
+			const today = new Date()
+			const maxdate = `11/20/` + today.getFullYear()
+
+			jQuery(`[id=\"tour-package-calc-first-payment-date\"]`).val(
+				today.getMonth() + 1
+				+`/`
+				+ today.getDate()
+				+`/`
+				+ today.getFullYear()
+			).datepicker({maxDate: maxdate})
+
+			jQuery(`[id=\"tour-package-calc-final-payment-date\"]`).val(maxdate).datepicker({maxDate: maxdate})
 
 			tour_package_calculator ()
 			function tour_package_calculator () {
 				const package_selection = parseFloat(document.getElementById(`package_selection`).value)
 				const extension = parseFloat(document.getElementById(`extension`).value)
-				const add_ons = parseFloat(document.getElementById(`add_ons`).value)
+				
+				let add_ons = 0
+				jQuery(`.tour_package_calculator_add_ons`).each(function () {
+					const add_on = jQuery(this)
+					add_ons += (parseFloat(add_on.val()) || 0) * parseFloat(add_on.attr(`data-price`))
+				})
 
-				const picked = document.getElementById(`tour-package-calc-first-payment-date`).value.split(`/`)
-				const first = new Date(picked[2], picked[0], picked[1])
-				const current_year_final = new Date(first.getFullYear(), 11, 20)
-				const next_year_final = new Date(first.getFullYear() + 1, 11, 20)
-				const final = first > current_year_final ? next_year_final : current_year_final
+				let first = document.getElementById(`tour-package-calc-first-payment-date`).value.split(`/`)
+				first = new Date(first[2], first[0], first[1])
+
+				let final = document.getElementById(`tour-package-calc-final-payment-date`).value.split(`/`)
+				final = new Date(final[2], final[0], final[1])
 
 				const weeks = Math.round((final - first) / (7 * 24 * 60 * 60 * 1000));
 				const months= tour_package_calculator_month(first, final)
-
-				document.getElementById(`tour-package-calc-final-payment-date`).value = `11/20/` + final.getFullYear()
-				document.getElementById(`tour-package-calc-upfront`).innerHTML = ((package_selection + extension + add_ons - 50) * 0.029).toFixed(2)
+				
+				document.getElementById(`tour-package-calc-upfront`).innerHTML = ((package_selection + extension + add_ons - 50) * 1.029).toFixed(2)
 				jQuery(`.tour-package-calc-weeks`).html(weeks)
-				document.getElementById(`tour-package-calc-weekly`).innerHTML = ((package_selection + extension + add_ons - 50) * 0.119 / weeks).toFixed(2)
-				document.getElementById(`tour-package-calc-monthly`).innerHTML = ((package_selection + extension + add_ons - 50) * 0.119 / months).toFixed(2)
+				document.getElementById(`tour-package-calc-weekly`).innerHTML = ((package_selection + extension + add_ons - 50) * 1.119 / weeks).toFixed(2)
+				jQuery(`.tour-package-calc-months`).html(months)
+				document.getElementById(`tour-package-calc-monthly`).innerHTML = ((package_selection + extension + add_ons - 50) * 1.119 / months).toFixed(2)
 			}
 
 			function tour_package_calculator_month(d1, d2) {
-				var months;
-				months = (d2.getFullYear() - d1.getFullYear()) * 12;
-				months -= d1.getMonth();
-				months += d2.getMonth();
-				return months <= 0 ? 0 : months;
+				var months
+				months = (d2.getFullYear() - d1.getFullYear()) * 12
+				months -= d1.getMonth()
+				months += d2.getMonth()
+				months = months <= 0 ? 0 : months
+				return months + 1
 			}
 		</script>
 	";
