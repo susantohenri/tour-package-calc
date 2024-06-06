@@ -53,6 +53,8 @@ add_shortcode('tour-package-calculator', function () {
 	}, $dropdowns);
 
 	$html = '';
+
+	$html .= "<textarea class=\"tour-package-calculator-wysiwyg\"></textarea><br>";
 	foreach ($dropdowns as $i => $d) {
 		if ($i > 1) continue;
 		$html .= "<label><b>{$d['label']}</b></label> ";
@@ -78,6 +80,10 @@ add_shortcode('tour-package-calculator', function () {
 		<link rel=\"stylesheet\" href=\"/resources/demos/style.css\">
 		<script src=\"https://code.jquery.com/jquery-3.7.1.js\"></script>
 		<script src=\"https://code.jquery.com/ui/1.13.3/jquery-ui.js\"></script>
+
+		<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/ui/trumbowyg.min.css\">
+		<script type=\"text/javascript\" src=\"https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/trumbowyg.min.js\"></script>
+
 	";
 
 	$html .= "<label><b>FIRST PAYMENT DATE</b></label> <input type=\"text\" id=\"tour-package-calc-first-payment-date\" onchange=\"javascript:tour_package_calculator();\" ><br>";
@@ -89,10 +95,11 @@ add_shortcode('tour-package-calculator', function () {
 	$html .= "<br><b>MONTHLY</b> $51.95  DEPOSIT + (<span class=\"tour-package-calc-months\"></span>) INSTALMENTS OF $<span id=\"tour-package-calc-monthly\">0</span> PER PERSON";
 
 	$html .= "<br><br>THE ABOVE INCLUDES 2.9% CREDIT CARD FEE & 9% FINANCING ADMIN FEE FOR WEEKLY OR MONTHLY";
+	$html .= "<textarea class=\"tour-package-calculator-wysiwyg\"></textarea><br>";
 
 	$html .= "
 		<script type=\"text/javascript\">
-
+			jQuery(`.tour-package-calculator-wysiwyg`).trumbowyg()
 			const today = new Date()
 			const maxdate = `11/20/` + today.getFullYear()
 
