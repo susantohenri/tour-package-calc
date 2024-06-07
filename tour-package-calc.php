@@ -71,7 +71,14 @@ add_shortcode('tour-package-calculator', function () {
 		<label><b>ADD ONS</b></label>
 	";
 	foreach ($dropdowns[2]['options'] as $add_on) {
-		$html .= "<br><input style=\"width: 50%\" type=\"text\" onKeyUp=\"javascript:tour_package_calculator();\" class=\"tour_package_calculator_add_ons\" data-price=\"{$add_on['value']}\"> {$add_on['text']}<br>";
+		$html .= "<br>
+			<select onchange=\"javascript:tour_package_calculator();\" class=\"tour_package_calculator_add_ons\" data-price=\"{$add_on['value']}\">
+				<option value=\"0\">0</option>
+				<option value=\"1\">1</option>
+				<option value=\"2\">2</option>
+			</select>
+			{$add_on['text']}<br>
+		";
 	}
 	$html .= "<br>";
 
