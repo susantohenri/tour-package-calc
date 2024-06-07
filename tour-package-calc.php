@@ -71,7 +71,7 @@ add_shortcode('tour-package-calculator', function () {
 		<label><b>ADD ONS</b></label>
 	";
 	foreach ($dropdowns[2]['options'] as $add_on) {
-		$html .= "<br><input type=\"text\" onKeyUp=\"javascript:tour_package_calculator();\" class=\"tour_package_calculator_add_ons\" data-price=\"{$add_on['value']}\"> {$add_on['text']}";
+		$html .= "<br><input style=\"width: 50%\" type=\"text\" onKeyUp=\"javascript:tour_package_calculator();\" class=\"tour_package_calculator_add_ons\" data-price=\"{$add_on['value']}\"> {$add_on['text']}<br>";
 	}
 	$html .= "<br>";
 
@@ -88,14 +88,14 @@ add_shortcode('tour-package-calculator', function () {
 
 	$html .= "<label><b>FIRST PAYMENT DATE</b></label> <input type=\"text\" id=\"tour-package-calc-first-payment-date\" onchange=\"javascript:tour_package_calculator();\" ><br>";
 
-	$html .= "<label><b>FINAL PAYMENT DATE</b></label> <input type=\"text\" id=\"tour-package-calc-final-payment-date\" ><br>";
+	$html .= "<label><b>FINAL PAYMENT DATE</b></label> <input type=\"text\" id=\"tour-package-calc-final-payment-date\" onchange=\"javascript:tour_package_calculator();\" ><br>";
 
 	$html .= "<br><b>UPFRONT (WITHIN 7 DAYS)</b> $51.95 DEPOSIT + ONE FINAL PAYMENT OF $<span id=\"tour-package-calc-upfront\">0</span> PER PERSON";
 	$html .= "<br><b>WEEKLY</b> $51.95 DEPOSIT + (<span class=\"tour-package-calc-weeks\"></span>) INSTALMENTS OF $<span id=\"tour-package-calc-weekly\">0</span> PER PERSON";
 	$html .= "<br><b>MONTHLY</b> $51.95  DEPOSIT + (<span class=\"tour-package-calc-months\"></span>) INSTALMENTS OF $<span id=\"tour-package-calc-monthly\">0</span> PER PERSON";
 
 	$html .= "<br><br>THE ABOVE INCLUDES 2.9% CREDIT CARD FEE & 9% FINANCING ADMIN FEE FOR WEEKLY OR MONTHLY";
-	$html .= "<textarea class=\"tour-package-calculator-wysiwyg\"></textarea><br>";
+	$html .= "<br><br><br><br><br><br><textarea class=\"tour-package-calculator-wysiwyg\"></textarea><br>";
 
 	$html .= "
 		<script type=\"text/javascript\">
