@@ -15,7 +15,8 @@ define('TOUR_PACKAGE_CALC_DEFAULT_DROPDOWNS', [
 			['text' => 'REFEREE', 'value' => 1199],
 			['text' => 'SOLO TRAVELER', 'value' => 1899],
 			['text' => 'COUPLE (WITH OPTION FOR KIDS)', 'value' => 1899]
-		]
+		],
+		'note' => ''
 	],
 	[
 		'name' => 'extension',
@@ -27,7 +28,8 @@ define('TOUR_PACKAGE_CALC_DEFAULT_DROPDOWNS', [
 			['text' => 'OWN FLIGHTS - 3 NIGHTS', 'value' => -700],
 			['text' => 'OWN FLIGHTS - 5 NIGHTS', 'value' => -351],
 			['text' => 'OWN FLIGHTS - 7 NIGHTS', 'value' => 2]
-		]
+		],
+		'note' => ''
 	],
 	[
 		'name' => 'add_ons',
@@ -36,7 +38,8 @@ define('TOUR_PACKAGE_CALC_DEFAULT_DROPDOWNS', [
 			['text' => 'SINGLET', 'value' => 69],
 			['text' => 'CHILD (12 & UNDER)', 'value' => 899],
 			['text' => 'INFANT (24 MONTHS & UNDER)', 'value' => 199],
-		]
+		],
+		'note' => ''
 	],
 ]);
 
@@ -54,7 +57,6 @@ add_shortcode('tour-package-calculator', function () {
 
 	$html = '';
 
-	$html .= "<textarea class=\"tour-package-calculator-wysiwyg\"></textarea><br>";
 	foreach ($dropdowns as $i => $d) {
 		if ($i > 1) continue;
 		$html .= "<label><b>{$d['label']}</b></label> ";
@@ -87,26 +89,21 @@ add_shortcode('tour-package-calculator', function () {
 		<link rel=\"stylesheet\" href=\"/resources/demos/style.css\">
 		<script src=\"https://code.jquery.com/jquery-3.7.1.js\"></script>
 		<script src=\"https://code.jquery.com/ui/1.13.3/jquery-ui.js\"></script>
-
-		<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/ui/trumbowyg.min.css\">
-		<script type=\"text/javascript\" src=\"https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/trumbowyg.min.js\"></script>
-
 	";
 
 	$html .= "<label><b>FIRST PAYMENT DATE</b></label> <input type=\"text\" id=\"tour-package-calc-first-payment-date\" onchange=\"javascript:tour_package_calculator();\" ><br>";
 
 	$html .= "<label><b>FINAL PAYMENT DATE</b></label> <input type=\"text\" id=\"tour-package-calc-final-payment-date\" onchange=\"javascript:tour_package_calculator();\" ><br>";
 
-	$html .= "<br><b>UPFRONT (WITHIN 7 DAYS)</b> $51.95 DEPOSIT + ONE FINAL PAYMENT OF $<span id=\"tour-package-calc-upfront\">0</span> PER PERSON";
-	$html .= "<br><b>WEEKLY</b> $51.95 DEPOSIT + (<span class=\"tour-package-calc-weeks\"></span>) INSTALMENTS OF $<span id=\"tour-package-calc-weekly\">0</span> PER PERSON";
-	$html .= "<br><b>MONTHLY</b> $51.95  DEPOSIT + (<span class=\"tour-package-calc-months\"></span>) INSTALMENTS OF $<span id=\"tour-package-calc-monthly\">0</span> PER PERSON";
+	$html .= "<br><b>YOUR PACKAGE PAYMENT OPTIONS:</b>";
+	$html .= "<br><b>UPFRONT</b> $51.95 DEPOSIT + ONE FINAL PAYMENT OF $<span id=\"tour-package-calc-upfront\">0</span>";
+	$html .= "<br><b>WEEKLY</b> $51.95 DEPOSIT + (<span class=\"tour-package-calc-weeks\"></span>) INSTALMENTS OF $<span id=\"tour-package-calc-weekly\">0</span>";
+	$html .= "<br><b>MONTHLY</b> $51.95  DEPOSIT + (<span class=\"tour-package-calc-months\"></span>) INSTALMENTS OF $<span id=\"tour-package-calc-monthly\">0</span>";
 
-	$html .= "<br><br>THE ABOVE INCLUDES 2.9% CREDIT CARD FEE & 9% FINANCING ADMIN FEE FOR WEEKLY OR MONTHLY";
-	$html .= "<br><br><br><br><br><br><textarea class=\"tour-package-calculator-wysiwyg\"></textarea><br>";
+	$html .= "<br><br><i>The above instalments include the 2.8% credit card fee, and 9% admin fee for weekly or monthly instalments.</i>";
 
 	$html .= "
 		<script type=\"text/javascript\">
-			jQuery(`.tour-package-calculator-wysiwyg`).trumbowyg()
 			const today = new Date()
 			const maxdate = `11/20/` + today.getFullYear()
 
@@ -123,8 +120,9 @@ add_shortcode('tour-package-calculator', function () {
 			tour_package_calculator ()
 			function tour_package_calculator () {
 				const package_selection = parseFloat(document.getElementById(`package_selection`).value)
-				const extension = parseFloat(document.getElementById(`extension`).value)
-				
+				let extension = parseFloat(document.getElementById(`extension`).value)
+				if (-1 < jQuery(`#package_selection option:selected`).text().toLowerCase().indexOf(`couple`)) extension *= 2
+
 				let add_ons = 0
 				jQuery(`.tour_package_calculator_add_ons`).each(function () {
 					const add_on = jQuery(this)
@@ -192,13 +190,40 @@ add_action('admin_menu', function () {
 						const name = select.name
 						let placeholder = form.find(`#`+name)
 						if (1 > placeholder.length) {
-							jQuery(`<div class=\"tour_package_calculator_config_placeholder\" id=\"`+name+`\"><b>`+select.label+`</b></div><br>`).insertBefore(`#tour_package_calculator_update_option`)
+							jQuery(`
+								<table class=\"tour_package_calculator_config_placeholder\" id=\"`+name+`\">
+									<thead>
+										<tr>
+											<th><b>`+select.label+`</b></th>
+											<th></th>
+										</tr>
+									</thead>
+									<tbody>
+									</tbody>
+								</table><br>
+							`).insertBefore(`#tour_package_calculator_update_option`)
 							placeholder = form.find(`#`+name)
 						} else placeholder.html(``)
 
 						for (let option of select.options) {
-							placeholder.append(`<br><span class=\"tour_package_calculator_config_option\">Text: <input class=\"text\" value=\"`+option.text+`\"> Price: <input class=\"value\" value=\"`+option.value+`\"></span>`)
+							placeholder.find(`tbody`).append(`
+								<tr>
+									<td class=\"tour_package_calculator_config_option\">
+										Text: <input class=\"text\" value=\"`+option.text+`\"> Price: <input class=\"value\" value=\"`+option.value+`\">
+									</td>
+								</tr>
+							`)
 						}
+
+						const rowspan = select.options.length
+						const rows = rowspan + 2
+						select.note = select.note.replaceAll(`\\\\n`, `\n`)
+						placeholder.find(`tbody`).find(`tr`).eq(0).append(`
+							<td rowspan=\"`+rowspan+`\">
+								<textarea style=\"white-space: pre-wrap;\" rows=\"`+rows+`\">`+select.note+`</textarea>
+							</td>
+						`)
+
 					}
 				}
 
@@ -206,6 +231,7 @@ add_action('admin_menu', function () {
 					const json = JSON.parse(jQuery(`#tour_package_calculator_updated_option`).val())
 					jQuery(`.tour_package_calculator_config_placeholder`).each(function() {
 						const name = jQuery(this).attr(`id`)
+						const note = jQuery(this).find(`textarea`).val()
 						let options = []
 						jQuery(this).find(`.tour_package_calculator_config_option`).each(function () {
 							options.push({
@@ -214,7 +240,10 @@ add_action('admin_menu', function () {
 							})
 						})
 						for (let i in json) {
-							if (json[i].name == name) json[i].options = options
+							if (json[i].name == name) {
+								json[i].options = options
+								json[i].note = note
+							}
 						}
 					})
 					jQuery(`#tour_package_calculator_updated_option`).val(JSON.stringify(json))
