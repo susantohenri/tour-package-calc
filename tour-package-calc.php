@@ -159,10 +159,16 @@ add_action('admin_menu', function () {
 	add_menu_page('Tour Package Calculator', 'Tour Package Calculator', 'manage_options', 'tour-package-calculator', function () {
 
 		$stored = null;
+		$mmq = asw('mmq', null);
+		$ktl = asw('ktl', null);
 		if (isset($_POST['tour_package_calculator_update_option'])) {
 			$stored = tour_package_calculator_option(str_replace('\"', '"', $_POST['tour_package_calculator_updated_option']));
+			$mmq = asw('mmq', $_POST['mmq']);
+			$ktl = asw('ktl', $_POST['ktl']);
 		} else if (isset($_POST['tour_package_calculator_reset_option'])) {
 			$stored = tour_package_calculator_option(json_encode(TOUR_PACKAGE_CALC_DEFAULT_DROPDOWNS));
+			$mmq = asw('mmq', '');
+			$ktl = asw('ktl', '');
 		}
 
 		if (!$stored) $stored = tour_package_calculator_option();
@@ -173,11 +179,21 @@ add_action('admin_menu', function () {
 			<br>
 			<form method=\"POST\" id=\"tour_package_calculator_form\">
 				<textarea style=\"display: none\" id=\"tour_package_calculator_updated_option\" name=\"tour_package_calculator_updated_option\" cols=\"100\" rows=\"5\">{$stored}</textarea>
+
+				<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/ui/trumbowyg.min.css\">
+				<style>.trumbowyg-editor{background: white; min-height: 275px !important}</style>
+				<script type=\"text/javascript\" src=\"https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/trumbowyg.min.js\"></script>
+				<textarea name=\"mmq\" class=\"tour-package-calculator-wysiwyg\">" . $mmq . "</textarea>
 				<br>
+				<br id=\"celeng\" >
+				<textarea name=\"ktl\" class=\"tour-package-calculator-wysiwyg\">" . $ktl . "</textarea>
+				<br>
+
 				<input id=\"tour_package_calculator_update_option\" name=\"tour_package_calculator_update_option\" type=\"submit\" class=\"button action\" value=\"Submit\">
 				<input name=\"tour_package_calculator_reset_option\" type=\"submit\" class=\"button action\" value=\"Reset\">
 			</form>
 			<script type=\"text/javascript\">
+				jQuery(`.tour-package-calculator-wysiwyg`).trumbowyg()
 				tour_package_calculator_to_inputs()
 				function tour_package_calculator_to_inputs () {
 					const form = jQuery(`#tour_package_calculator_form`)
@@ -191,14 +207,14 @@ add_action('admin_menu', function () {
 								<table class=\"tour_package_calculator_config_placeholder\" id=\"`+name+`\">
 									<thead>
 										<tr>
-											<th><b>`+select.label+`</b></th>
+											<th style=\"text-align: left\"><b>`+select.label+`</b></th>
 											<th></th>
 										</tr>
 									</thead>
 									<tbody>
 									</tbody>
 								</table><br>
-							`).insertBefore(`#tour_package_calculator_update_option`)
+							`).insertBefore(`#celeng`)
 							placeholder = form.find(`#`+name)
 						} else placeholder.html(``)
 
@@ -271,4 +287,23 @@ function tour_package_calculator_option($option_value = null)
 	else $wpdb->update($option_table, ['option_value' => $option_value], ['option_name' => $option_name]);
 
 	return tour_package_calculator_option();
+}
+
+function asw($option_name, $option_value = null)
+{
+	global $wpdb;
+	$option_table = "{$wpdb->prefix}options";
+
+	$stored = $wpdb->get_var("SELECT option_value FROM {$option_table} WHERE option_name = {$option_name}");
+	if (!$stored) {
+		$wpdb->insert($option_table, [
+			'option_name' => $option_name,
+			'option_value' => ''
+		]);
+		$stored = '';
+	}
+	if (is_null($option_value)) $option_value = $stored;
+	else $wpdb->update($option_table, ['option_value' => $option_value], ['option_name' => $option_name]);
+
+	return $option_value;
 }
