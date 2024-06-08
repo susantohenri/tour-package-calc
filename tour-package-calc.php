@@ -183,10 +183,10 @@ add_action('admin_menu', function () {
 				<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/ui/trumbowyg.min.css\">
 				<style>.trumbowyg-editor{background: white; min-height: 275px !important}</style>
 				<script type=\"text/javascript\" src=\"https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/trumbowyg.min.js\"></script>
-				<textarea name=\"mmq\" class=\"tour-package-calculator-wysiwyg\">" . $mmq . "</textarea>
+				<textarea name=\"mmq\" class=\"tour-package-calculator-wysiwyg\">" . stripslashes($mmq) . "</textarea>
 				<br>
 				<br id=\"celeng\" >
-				<textarea name=\"ktl\" class=\"tour-package-calculator-wysiwyg\">" . $ktl . "</textarea>
+				<textarea name=\"ktl\" class=\"tour-package-calculator-wysiwyg\">" . stripslashes($ktl) . "</textarea>
 				<br>
 
 				<input id=\"tour_package_calculator_update_option\" name=\"tour_package_calculator_update_option\" type=\"submit\" class=\"button action\" value=\"Submit\">
