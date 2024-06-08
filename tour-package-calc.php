@@ -68,10 +68,7 @@ add_shortcode('tour-package-calculator', function () {
 		$html .= "<br>";
 	}
 
-	$html .= "
-		<br>
-		<label><b>ADD ONS</b></label>
-	";
+	$html .= "<label><b>ADD ONS</b></label>";
 	foreach ($dropdowns[2]['options'] as $add_on) {
 		$html .= "<br>
 			<select style=\"width: 10%; display: inline; margin-right: 10px\" onchange=\"javascript:tour_package_calculator();\" class=\"tour_package_calculator_add_ons\" data-price=\"{$add_on['value']}\">
@@ -93,12 +90,12 @@ add_shortcode('tour-package-calculator', function () {
 
 	$html .= "<label><b>FIRST PAYMENT DATE</b></label> <input type=\"text\" id=\"tour-package-calc-first-payment-date\" onchange=\"javascript:tour_package_calculator();\" ><br>";
 
-	$html .= "<label><b>FINAL PAYMENT DATE</b></label> <input type=\"text\" id=\"tour-package-calc-final-payment-date\" onchange=\"javascript:tour_package_calculator();\" ><br>";
+	$html .= "<br><label><b>FINAL PAYMENT DATE</b></label> <input type=\"text\" id=\"tour-package-calc-final-payment-date\" onchange=\"javascript:tour_package_calculator();\" ><br>";
 
 	$html .= "<br><b>YOUR PACKAGE PAYMENT OPTIONS:</b>";
 	$html .= "<br><b>UPFRONT</b> $51.95 DEPOSIT + ONE FINAL PAYMENT OF $<span id=\"tour-package-calc-upfront\">0</span>";
-	$html .= "<br><b>WEEKLY</b> $51.95 DEPOSIT + (<span class=\"tour-package-calc-weeks\"></span>) INSTALMENTS OF $<span id=\"tour-package-calc-weekly\">0</span>";
-	$html .= "<br><b>MONTHLY</b> $51.95  DEPOSIT + (<span class=\"tour-package-calc-months\"></span>) INSTALMENTS OF $<span id=\"tour-package-calc-monthly\">0</span>";
+	$html .= "<br><b>WEEKLY</b> $51.95 DEPOSIT + <span class=\"tour-package-calc-weeks\"></span> WEEKLY INSTALMENTS OF $<span id=\"tour-package-calc-weekly\">0</span>";
+	$html .= "<br><b>MONTHLY</b> $51.95  DEPOSIT + <span class=\"tour-package-calc-months\"></span> MONTHLY INSTALMENTS OF $<span id=\"tour-package-calc-monthly\">0</span>";
 
 	$html .= "<br><br><i>The above instalments include the 2.8% credit card fee, and 9% admin fee for weekly or monthly instalments.</i>";
 
